@@ -21,6 +21,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class QGram extends ShingleBased implements StringDistance {
 
+	private final boolean takeOnlyProfiles;
+	
     /**
      * Q-gram similarity and distance. Defined by Ukkonen in "Approximate
      * string-matching with q-grams and maximal matches",
@@ -34,6 +36,7 @@ public class QGram extends ShingleBased implements StringDistance {
      */
     public QGram(final int k) {
         super(k);
+        this.takeOnlyProfiles = false;
     }
 
     /**
@@ -48,8 +51,15 @@ public class QGram extends ShingleBased implements StringDistance {
      */
     public QGram() {
         super();
+        this.takeOnlyProfiles = false;
     }
 
+    public QGram(final boolean takeOnlyProfiles) {
+        super();
+        this.takeOnlyProfiles = takeOnlyProfiles;
+    }
+    
+    
     /**
      * The distance between two strings is defined as the L1 norm of the
      * difference of their profiles (the number of occurence of each k-shingle).
@@ -60,6 +70,11 @@ public class QGram extends ShingleBased implements StringDistance {
      * @throws NullPointerException if s1 or s2 is null.
      */
     public final double distance(final String s1, final String s2) {
+    	
+    	if (takeOnlyProfiles)
+			throw new IllegalArgumentException(
+					"This object can compute similarity only for strings represented by precomputed profiles.");
+    	
         if (s1 == null) {
             throw new NullPointerException("s1 must not be null");
         }

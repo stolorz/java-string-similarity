@@ -35,86 +35,128 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Each input string is converted into a set of n-grams, the Jaccard index is
- * then computed as |V1 inter V2| / |V1 union V2|.
- * Like Q-Gram distance, the input strings are first converted into sets of
- * n-grams (sequences of n characters, also called k-shingles), but this time
- * the cardinality of each n-gram is not taken into account.
- * Distance is computed as 1 - cosine similarity.
- * Jaccard index is a metric distance.
+ * then computed as |V1 inter V2| / |V1 union V2|. Like Q-Gram distance, the
+ * input strings are first converted into sets of n-grams (sequences of n
+ * characters, also called k-shingles), but this time the cardinality of each
+ * n-gram is not taken into account. Distance is computed as 1 - cosine
+ * similarity. Jaccard index is a metric distance.
+ * 
  * @author Thibault Debatty
  */
 @Immutable
-public class Jaccard extends ShingleBased implements
-        MetricStringDistance, NormalizedStringDistance,
-        NormalizedStringSimilarity {
+public class Jaccard extends ShingleBased
+		implements MetricStringDistance, NormalizedStringDistance, NormalizedStringSimilarity {
 
-    /**
-     * The strings are first transformed into sets of k-shingles (sequences of k
-     * characters), then Jaccard index is computed as |A inter B| / |A union B|.
-     * The default value of k is 3.
-     *
-     * @param k
-     */
-    public Jaccard(final int k) {
-        super(k);
-    }
+	
+	private final boolean takeOnlyProfiles;
+	
+	/**
+	 * The strings are first transformed into sets of k-shingles (sequences of k
+	 * characters), then Jaccard index is computed as |A inter B| / |A union B|.
+	 * The default value of k is 3.
+	 *
+	 * @param k
+	 */
+	public Jaccard(final int k) {
+		super(k);
+		this.takeOnlyProfiles = false;
+	}
 
-    /**
-     * The strings are first transformed into sets of k-shingles (sequences of k
-     * characters), then Jaccard index is computed as |A inter B| / |A union B|.
-     * The default value of k is 3.
-     */
-    public Jaccard() {
-        super();
-    }
-
-    /**
-     * Compute Jaccard index: |A inter B| / |A union B|.
-     * @param s1 The first string to compare.
-     * @param s2 The second string to compare.
-     * @return The Jaccard index in the range [0, 1]
-     * @throws NullPointerException if s1 or s2 is null.
-     */
-    public final double similarity(final String s1, final String s2) {
-        if (s1 == null) {
-            throw new NullPointerException("s1 must not be null");
-        }
-
-        if (s2 == null) {
-            throw new NullPointerException("s2 must not be null");
-        }
-
-        if (s1.equals(s2)) {
-            return 1;
-        }
-
-        Map<String, Integer> profile1 = getProfile(s1);
-        Map<String, Integer> profile2 = getProfile(s2);
-
-        Set<String> union = new HashSet<String>();
-        union.addAll(profile1.keySet());
-        union.addAll(profile2.keySet());
-
-        int inter = 0;
-
-        for (String key : union) {
-            if (profile1.containsKey(key) && profile2.containsKey(key)) {
-                inter++;
-            }
-        }
-
-        return 1.0 * inter / union.size();
-    }
+	/**
+	 * The strings are first transformed into sets of k-shingles (sequences of k
+	 * characters), then Jaccard index is computed as |A inter B| / |A union B|.
+	 * The default value of k is 3.
+	 */
+	public Jaccard() {
+		super();
+		this.takeOnlyProfiles = false;
+	}
 
 
-    /**
-     * Distance is computed as 1 - similarity.
-     * @param s1 The first string to compare.
-     * @param s2 The second string to compare.
-     * @return 1 - the Jaccard similarity.
-     * @throws NullPointerException if s1 or s2 is null.
-     */
-    public final double distance(final String s1, final String s2) {
-        return 1.0 - similarity(s1, s2);
-    }
+	public Jaccard(final boolean takeOnlyProfiles) {
+		super();
+		this.takeOnlyProfiles = takeOnlyProfiles;
+	}
+
+	
+	
+	
+	/**
+	 * Compute Jaccard index: |A inter B| / |A union B|.
+	 * 
+	 * @param s1
+	 *            The first string to compare.
+	 * @param s2
+	 *            The second string to compare.
+	 * @return The Jaccard index in the range [0, 1]
+	 * @throws NullPointerException
+	 *             if s1 or s2 is null.
+	 */
+	public final double similarity(final String s1, final String s2) {
+		
+		if (takeOnlyProfiles)
+			throw new IllegalArgumentException(
+					"This object can compute similarity only for strings represented by precomputed profiles.");
+		
+		if (s1 == null) {
+			throw new NullPointerException("s1 must not be null");
+		}
+
+		if (s2 == null) {
+			throw new NullPointerException("s2 must not be null");
+		}
+
+		if (s1.equals(s2)) {
+			return 1;
+		}
+
+		Map<String, Integer> profile1 = getProfile(s1);
+		Map<String, Integer> profile2 = getProfile(s2);
+
+		return similarity(profile1, profile2);
+	}
+
+	public final double similarity(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
+		if (profile1 == null) {
+			throw new NullPointerException("profile1 must not be null");
+		}
+
+		if (profile2 == null) {
+			throw new NullPointerException("profile2 must not be null");
+		}
+
+		Set<String> union = new HashSet<String>();
+		union.addAll(profile1.keySet());
+		union.addAll(profile2.keySet());
+
+		int inter = 0;
+
+		for (String key : union) {
+			if (profile1.containsKey(key) && profile2.containsKey(key)) {
+				inter++;
+			}
+		}
+
+		return 1.0 * inter / union.size();
+	}
+
+	/**
+	 * Distance is computed as 1 - similarity.
+	 * 
+	 * @param s1
+	 *            The first string to compare.
+	 * @param s2
+	 *            The second string to compare.
+	 * @return 1 - the Jaccard similarity.
+	 * @throws NullPointerException
+	 *             if s1 or s2 is null.
+	 */
+	public final double distance(final String s1, final String s2) {
+		return 1.0 - similarity(s1, s2);
+	}
+	
+	public final double distance(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
+		return 1.0 - similarity(profile1, profile2);
+	}
+
 }
