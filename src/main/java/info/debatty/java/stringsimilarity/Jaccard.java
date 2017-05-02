@@ -24,13 +24,11 @@
 
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.interfaces.MetricStringDistance;
-import info.debatty.java.stringsimilarity.interfaces.NormalizedStringSimilarity;
-import info.debatty.java.stringsimilarity.interfaces.NormalizedStringDistance;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import info.debatty.java.stringsimilarity.interfaces.MetricStringDistance;
+import info.debatty.java.stringsimilarity.interfaces.NormalizedStringDistance;
+import info.debatty.java.stringsimilarity.interfaces.NormalizedStringSimilarity;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -47,9 +45,8 @@ import net.jcip.annotations.Immutable;
 public class Jaccard extends ShingleBased
 		implements MetricStringDistance, NormalizedStringDistance, NormalizedStringSimilarity {
 
-	
 	private final boolean takeOnlyProfiles;
-	
+
 	/**
 	 * The strings are first transformed into sets of k-shingles (sequences of k
 	 * characters), then Jaccard index is computed as |A inter B| / |A union B|.
@@ -72,15 +69,11 @@ public class Jaccard extends ShingleBased
 		this.takeOnlyProfiles = false;
 	}
 
-
 	public Jaccard(final boolean takeOnlyProfiles) {
 		super();
 		this.takeOnlyProfiles = takeOnlyProfiles;
 	}
 
-	
-	
-	
 	/**
 	 * Compute Jaccard index: |A inter B| / |A union B|.
 	 * 
@@ -92,12 +85,14 @@ public class Jaccard extends ShingleBased
 	 * @throws NullPointerException
 	 *             if s1 or s2 is null.
 	 */
+	@Override
 	public final double similarity(final String s1, final String s2) {
-		
-		if (takeOnlyProfiles)
+
+		if (takeOnlyProfiles) {
 			throw new IllegalArgumentException(
 					"This object can compute similarity only for strings represented by precomputed profiles.");
-		
+		}
+
 		if (s1 == null) {
 			throw new NullPointerException("s1 must not be null");
 		}
@@ -125,19 +120,20 @@ public class Jaccard extends ShingleBased
 			throw new NullPointerException("profile2 must not be null");
 		}
 
-		Set<String> union = new HashSet<String>();
-		union.addAll(profile1.keySet());
-		union.addAll(profile2.keySet());
+		if(profile1.keySet().isEmpty() && profile2.keySet().isEmpty())
+			return 1;
+		
+		int intersection_size = 0;
 
-		int inter = 0;
-
-		for (String key : union) {
-			if (profile1.containsKey(key) && profile2.containsKey(key)) {
-				inter++;
+		for (String key : profile1.keySet()) {
+			if (profile2.containsKey(key)) {
+				intersection_size++;
 			}
 		}
 
-		return 1.0 * inter / union.size();
+		int union_size = profile2.size() + profile2.size() - intersection_size;
+
+		return 1.0 * intersection_size / union_size;
 	}
 
 	/**
@@ -151,10 +147,11 @@ public class Jaccard extends ShingleBased
 	 * @throws NullPointerException
 	 *             if s1 or s2 is null.
 	 */
+	@Override
 	public final double distance(final String s1, final String s2) {
 		return 1.0 - similarity(s1, s2);
 	}
-	
+
 	public final double distance(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
 		return 1.0 - similarity(profile1, profile2);
 	}

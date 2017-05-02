@@ -24,10 +24,9 @@
 
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  *
@@ -35,37 +34,36 @@ import static org.junit.Assert.assertEquals;
  */
 public class JaccardTest {
 
-    /**
-     * Test of similarity method, of class Jaccard.
-     */
-    @Test
-    public void testSimilarity() {
-        System.out.println("similarity");
-        Jaccard instance = new Jaccard(2);
-        
-        // AB BC CD DE DF
-        // 1  1  1  1  0
-        // 1  1  1  0  1
-        // => 3 / 5 = 0.6
-        double result = instance.similarity("ABCDE", "ABCDF");
-        assertEquals(0.6, result, 0.0);
+	/**
+	 * Test of similarity method, of class Jaccard.
+	 */
+	@Test
+	public void testSimilarity() {
+		System.out.println("similarity");
+		Jaccard instance = new Jaccard(2);
 
-        NullEmptyTests.testSimilarity(instance);
-    }
+		// AB BC CD DE DF
+		// 1 1 1 1 0
+		// 1 1 1 0 1
+		// => 3 / 5 = 0.6
+		double result = instance.similarity("ABCDE", "ABCDF");
+		assertEquals(0.6, result, 0.0);
 
-    /**
-     * Test of distance method, of class Jaccard.
-     */
-    @Test
-    public void testDistance() {
-        System.out.println("distance");
-        String s1 = "";
-        String s2 = "";
-        Jaccard instance = new Jaccard(2);
-        double expResult = 0.4;
-        double result = instance.distance("ABCDE", "ABCDF");
-        assertEquals(expResult, result, 0.0);
+		NullEmptyTests.testSimilarity(instance);
+	}
 
-        NullEmptyTests.testDistance(instance);
-    }
+	/**
+	 * Test of distance method, of class Jaccard.
+	 */
+	@Test
+	public void testDistance() {
+		System.out.println("distance");
+		Jaccard instance = new Jaccard(2);
+
+		double expResult = 0.4;
+		double result = instance.distance("ABCDE", "ABCDF");
+		assertEquals(expResult, result, 0.0);
+
+		NullEmptyTests.testDistance(instance);
+	}
 }

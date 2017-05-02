@@ -24,14 +24,14 @@
 
 package info.debatty.java.stringsimilarity;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

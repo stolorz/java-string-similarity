@@ -23,10 +23,9 @@
  */
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  *
@@ -48,4 +47,31 @@ public class LongestCommonSubsequenceTest {
 
         NullEmptyTests.testDistance(instance);
     }
+
+  /**
+   * Test of distance method, of class LongestCommonSubsequence.
+   */
+  @Test
+  public void testLength() {
+    System.out.println("distance");
+    LongestCommonSubsequence instance = new LongestCommonSubsequence();
+    
+
+
+    int dist = instance.length("abcda", "cdabac");
+    System.out.println(dist);
+    
+    assertEquals(3, dist);
+
+
+    String txt1 = "FBBDECBBFEBFBDDFCACACCABFECCCFCDEFADDDCFAFEDECEEFA";
+    String txt2 = "BBDEFEFBADFBEEADACCFBAFCCDAECDCCCDFFBCCBCFDDEDEBDB";
+
+    dist = instance.length(txt1, txt2);
+    System.out.println(dist);
+    
+    assertEquals(28, dist);
+
+  }
+
 }

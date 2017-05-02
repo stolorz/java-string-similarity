@@ -1,14 +1,14 @@
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class WeightedLevenshteinTest {
     @Test
     public void testDistance() {
         WeightedLevenshtein instance = new WeightedLevenshtein(new CharacterSubstitutionInterface() {
+            @Override
             public double cost(char c1, char c2) {
                 // The cost for substituting 't' and 'r' is considered
                 // smaller as these 2 are located next to each other

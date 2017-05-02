@@ -30,21 +30,31 @@ package info.debatty.java.stringsimilarity.examples;
  */
 public class MetricLCS {
 
-        public static void main(String[] args) {
-        
-        info.debatty.java.stringsimilarity.MetricLCS lcs = 
-                new info.debatty.java.stringsimilarity.MetricLCS();
-        
-        String s1 = "ABCDEFG";   
-        String s2 = "ABCDEFHJKL";
-        // LCS: ABCDEF => length = 6
-        // longest = s2 => length = 10
-        // => 1 - 6/10 = 0.4
-        System.out.println(lcs.distance(s1, s2));
-        
-        // LCS: ABDF => length = 4
-        // longest = ABDEF => length = 5
-        // => 1 - 4 / 5 = 0.2
-        System.out.println(lcs.distance("ABDEF", "ABDIF"));
-    } 
+  public static void main(String[] args) {
+
+    info.debatty.java.stringsimilarity.MetricLCS mlcs = new info.debatty.java.stringsimilarity.MetricLCS();
+
+    info.debatty.java.stringsimilarity.LongestCommonSubsequence lcs = new info.debatty.java.stringsimilarity.LongestCommonSubsequence();
+
+    String s1 = "ABCDEFG";
+    String s2 = "ABCDEFHJKL";
+    // LCS: ABCDEF => length = 6
+    // longest = s2 => length = 10
+    // => 1 - 6/10 = 0.4
+    System.out.println(mlcs.distance(s1, s2));
+
+    //this should be the same as mlcs.distance(s1,s2)
+    System.out.println(1.0 - (1.0 * lcs.length(s1, s2)) / Math.max(s1.length(), s2.length()));
+
+    
+    //these two lines should produce the same output
+    System.out.println((double) s1.length() + s2.length() - 2 * lcs.length(s1, s2));
+    System.out.println(lcs.distance(s1, s2));
+
+    // LCS: ABDF => length = 4
+    // longest = ABDEF => length = 5
+    // => 1 - 4 / 5 = 0.2
+    System.out.println(mlcs.distance("ABDEF", "ABDIF"));
+
+  }
 }

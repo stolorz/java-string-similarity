@@ -24,9 +24,9 @@
 
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

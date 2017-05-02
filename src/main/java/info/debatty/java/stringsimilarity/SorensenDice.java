@@ -23,12 +23,10 @@
  */
 package info.debatty.java.stringsimilarity;
 
-import info.debatty.java.stringsimilarity.interfaces.NormalizedStringSimilarity;
-import info.debatty.java.stringsimilarity.interfaces.NormalizedStringDistance;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
+import info.debatty.java.stringsimilarity.interfaces.NormalizedStringDistance;
+import info.debatty.java.stringsimilarity.interfaces.NormalizedStringSimilarity;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -40,123 +38,120 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public class SorensenDice extends ShingleBased implements NormalizedStringDistance, NormalizedStringSimilarity {
 
-	private final boolean takeOnlyProfiles;
-	
-	/**
-	 * Sorensen-Dice coefficient, aka Sørensen index, Dice's coefficient or
-	 * Czekanowski's binary (non-quantitative) index.
-	 *
-	 * The strings are first converted to boolean sets of k-shingles (sequences
-	 * of k characters), then the similarity is computed as 2 * |A inter B| /
-	 * (|A| + |B|). Attention: Sorensen-Dice distance (and similarity) does not
-	 * satisfy triangle inequality.
-	 *
-	 * @param k
-	 */
-	public SorensenDice(final int k) {
-		super(k);
-		this.takeOnlyProfiles = false;
-	}
+  private final boolean takeOnlyProfiles;
 
-	/**
-	 * Sorensen-Dice coefficient, aka Sørensen index, Dice's coefficient or
-	 * Czekanowski's binary (non-quantitative) index.
-	 *
-	 * The strings are first converted to boolean sets of k-shingles (sequences
-	 * of k characters), then the similarity is computed as 2 * |A inter B| /
-	 * (|A| + |B|). Attention: Sorensen-Dice distance (and similarity) does not
-	 * satisfy triangle inequality. Default k is 3.
-	 */
-	public SorensenDice() {
-		super();
-		this.takeOnlyProfiles = false;
+  /**
+   * Sorensen-Dice coefficient, aka Sørensen index, Dice's coefficient or
+   * Czekanowski's binary (non-quantitative) index.
+   *
+   * The strings are first converted to boolean sets of k-shingles (sequences
+   * of k characters), then the similarity is computed as 2 * |A inter B| /
+   * (|A| + |B|). Attention: Sorensen-Dice distance (and similarity) does not
+   * satisfy triangle inequality.
+   *
+   * @param k
+   */
+  public SorensenDice(final int k) {
+    super(k);
+    this.takeOnlyProfiles = false;
+  }
 
-	}
+  /**
+   * Sorensen-Dice coefficient, aka Sørensen index, Dice's coefficient or
+   * Czekanowski's binary (non-quantitative) index.
+   *
+   * The strings are first converted to boolean sets of k-shingles (sequences
+   * of k characters), then the similarity is computed as 2 * |A inter B| /
+   * (|A| + |B|). Attention: Sorensen-Dice distance (and similarity) does not
+   * satisfy triangle inequality. Default k is 3.
+   */
+  public SorensenDice() {
+    super();
+    this.takeOnlyProfiles = false;
 
-	
-	public SorensenDice(final boolean takeOnlyProfiles) {
-		super();
-		this.takeOnlyProfiles = takeOnlyProfiles;
+  }
 
-	}
-	
-	/**
-	 * Similarity is computed as 2 * |A inter B| / (|A| + |B|).
-	 * 
-	 * @param s1
-	 *            The first string to compare.
-	 * @param s2
-	 *            The second string to compare.
-	 * @return The computed Sorensen-Dice similarity.
-	 * @throws NullPointerException
-	 *             if s1 or s2 is null.
-	 */
-	public final double similarity(final String s1, final String s2) {
-		
-		if (takeOnlyProfiles)
-			throw new IllegalArgumentException(
-					"This object can compute similarity only for strings represented by precomputed profiles.");
-		
-		if (s1 == null) {
-			throw new NullPointerException("s1 must not be null");
-		}
+  public SorensenDice(final boolean takeOnlyProfiles) {
+    super();
+    this.takeOnlyProfiles = takeOnlyProfiles;
 
-		if (s2 == null) {
-			throw new NullPointerException("s2 must not be null");
-		}
+  }
 
-		if (s1.equals(s2)) {
-			return 1;
-		}
+  /**
+   * Similarity is computed as 2 * |A inter B| / (|A| + |B|).
+   * 
+   * @param s1
+   *            The first string to compare.
+   * @param s2
+   *            The second string to compare.
+   * @return The computed Sorensen-Dice similarity.
+   * @throws NullPointerException
+   *             if s1 or s2 is null.
+   */
+  @Override
+  public final double similarity(final String s1, final String s2) {
 
-		Map<String, Integer> profile1 = getProfile(s1);
-		Map<String, Integer> profile2 = getProfile(s2);
+    if (takeOnlyProfiles) {
+      throw new IllegalArgumentException("This object can compute similarity only for strings represented by precomputed profiles.");
+    }
 
-		return similarity(profile1, profile2);
+    if (s1 == null) {
+      throw new NullPointerException("s1 must not be null");
+    }
 
-	}
+    if (s2 == null) {
+      throw new NullPointerException("s2 must not be null");
+    }
 
-	public final double similarity(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
+    if (s1.equals(s2)) {
+      return 1;
+    }
 
-		if (profile1 == null) {
-			throw new NullPointerException("profile1 must not be null");
-		}
+    Map<String, Integer> profile1 = getProfile(s1);
+    Map<String, Integer> profile2 = getProfile(s2);
 
-		if (profile2 == null) {
-			throw new NullPointerException("profile2 must not be null");
-		}
+    return similarity(profile1, profile2);
 
-		Set<String> union = new HashSet<String>();
-		union.addAll(profile1.keySet());
-		union.addAll(profile2.keySet());
+  }
 
-		int inter = 0;
+  public final double similarity(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
 
-		for (String key : union) {
-			if (profile1.containsKey(key) && profile2.containsKey(key)) {
-				inter++;
-			}
-		}
+    if (profile1 == null) {
+      throw new NullPointerException("profile1 must not be null");
+    }
 
-		return 2.0 * inter / (profile1.size() + profile2.size());
-	}
+    if (profile2 == null) {
+      throw new NullPointerException("profile2 must not be null");
+    }
 
-	/**
-	 * Returns 1 - similarity.
-	 * 
-	 * @param s1
-	 *            The first string to compare.
-	 * @param s2
-	 *            The second string to compare.
-	 * @return 1.0 - the computed similarity
-	 * @throws NullPointerException
-	 *             if s1 or s2 is null.
-	 */
-	public double distance(String s1, String s2) {
-		return 1 - similarity(s1, s2);
-	}
+    int intersection_size = 0;
 
-	public double distance(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
-		return 1 - similarity(profile1, profile2);
-	}
+    for (String key : profile1.keySet()) {
+      if (profile2.containsKey(key)) {
+        intersection_size++;
+      }
+    }
+
+    return 2.0 * intersection_size / (profile1.size() + profile2.size());
+  }
+
+  /**
+   * Returns 1 - similarity.
+   * 
+   * @param s1
+   *            The first string to compare.
+   * @param s2
+   *            The second string to compare.
+   * @return 1.0 - the computed similarity
+   * @throws NullPointerException
+   *             if s1 or s2 is null.
+   */
+  @Override
+  public double distance(String s1, String s2) {
+    return 1 - similarity(s1, s2);
+  }
+
+  public double distance(final Map<String, Integer> profile1, final Map<String, Integer> profile2) {
+    return 1 - similarity(profile1, profile2);
+  }
 }

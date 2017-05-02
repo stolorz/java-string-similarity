@@ -1,68 +1,66 @@
-/*
- * The MIT License
- *
- * Copyright 2015 Thibault Debatty.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 package info.debatty.java.stringsimilarity;
-
-import info.debatty.java.stringsimilarity.testutil.NullEmptyTests;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- *
- * @author Thibault Debatty
- */
+import java.util.Map;
+
+import org.junit.Test;
+
 public class QGramTest {
 
-    /**
-     * Test of distance method, of class QGram.
-     */
-    @Test
-    public final void testDistance() {
-        System.out.println("distance");
-        QGram instance = new QGram(2);
-        // AB BC CD CE
-        // 1  1  1  0
-        // 1  1  0  1
-        // Total: 2
-        double result = instance.distance("ABCD", "ABCE");
-        assertEquals(2.0, result, 0.0);
+  /**
+   * Test of distance method, of class QGram.
+   */
+  @Test
+  public final void testDistance() {
+    System.out.println("distance");
+    QGram instance = new QGram(2);
+    // AB BC CD CE
+    //  1  1  1  0
+    //  1  1  0  1
+    // Total: 2
+    double result = instance.distance("ABCD", "ABCE");
+    assertEquals(2.0, result, 0.0);
 
-        assertEquals(
-                0.0,
-                instance.distance("S", "S"),
-                0.0);
+    assertEquals(0.0, instance.distance("S", "S"), 0.0);
 
-        assertEquals(0.0,
-                instance.distance("012345", "012345"),
-                0.0);
+    assertEquals(0.0, instance.distance("012345", "012345"), 0.0);
 
-        // NOTE: not using null/empty tests in NullEmptyTests because QGram is different
-        assertEquals(0.0, instance.distance("", ""), 0.1);
-        assertEquals(2.0, instance.distance("", "foo"), 0.1);
-        assertEquals(2.0, instance.distance("foo", ""), 0.1);
+    // NOTE: not using null/empty tests in NullEmptyTests because QGram is
+    // different
+    assertEquals(0.0, instance.distance("", ""), 0.1);
+    assertEquals(2.0, instance.distance("", "foo"), 0.1);
+    assertEquals(2.0, instance.distance("foo", ""), 0.1);
 
-        NullEmptyTests.assertNullPointerExceptions(instance);
-    }
+    NullEmptyTests.assertNullPointerExceptions(instance);
+  }
+
+  @Test
+  public void testDistanceFromHashedProfile() {
+
+    String s1 = "Would you vote for John Millan?";
+    String s2 = "Would you vote for John MIller?";
+
+    QGram qGram = new QGram(3);
+
+    Map<String, Integer> profile1 = qGram.getProfile(s1);
+    Map<String, Integer> profile2 = qGram.getProfile(s2);
+
+    Map<Integer, Integer> hashedProfile1 = qGram.getHashedProfile(s1);
+    Map<Integer, Integer> hashedprofile2 = qGram.getHashedProfile(s2);
+
+    double distanceFromStrings = qGram.distance(s1, s2);
+    double distanceFromProfiles = qGram.distance(profile1, profile2);
+    double distanceFromHashedProfiles = qGram.distanceFromHashedProfile(hashedProfile1, hashedprofile2);
+
+    assertEquals(distanceFromProfiles, distanceFromStrings, 0.01);
+    assertEquals(distanceFromHashedProfiles, distanceFromStrings, 0.01);
+
+    System.out.println(distanceFromStrings);
+    System.out.println(distanceFromProfiles);
+    System.out.println(distanceFromHashedProfiles);
+
+  }
+
+
 }
